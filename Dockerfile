@@ -7,7 +7,7 @@ WORKDIR /app
 # Install depedensi sistem untuk OpenCV dan MediaPipe
 RUN apt-get update && apt-get install -y \
     python3-pip \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
@@ -34,8 +34,5 @@ ENV PYTHONUNBUFFERED=1
 ENV FLASK_ENV=production
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Expose port (Railway akan mengatur otomatis)
-EXPOSE $PORT
-
-# Jalankan aplikasi
+# Railway akan mengatur port otomatis
 CMD ["python", "app.py"]
