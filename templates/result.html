@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - Smart Focus Alert</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/result.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="flex justify-between items-center">
+                <a href="/" class="nav-brand text-gradient">
+                    <i class="fas fa-eye" style="margin-right: 8px;"></i>
+                    Smart Focus Alert
+                </a>
+                <div class="nav-links">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/live" class="nav-link">Live Monitor</a>
+                    <a href="/upload" class="nav-link">Upload</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="results-container">
+        <!-- Header -->
+        <div class="text-center mb-8 fade-in">
+            <h1 class="title-lg text-gradient mb-4">Analysis Results</h1>
+            <p style="color: var(--text-secondary);">Detailed focus analysis report for your uploaded media</p>
+        </div>
+
+        {% if result %}
+        <!-- Media Comparison -->
+        {% if result.type == 'image' %}
+        <div class="comparison-view slide-in">
+            <div class="media-section">
+                <h3><i class="fas fa-image" style="margin-right: 8px;"></i>Original Image</h3>
+                <img src="{{ result.file_path }}" alt="Original" class="media-preview">
+            </div>
+            <div class="media-section">
+                <h3><i class="fas fa-search" style="margin-right: 8px;"></i>Processed Image</h3>
+                <img src="{{ result.processed_image }}" alt="Processed" class="media-preview">
+            </div>
+        </div>
+        {% elif result.type == 'video' %}
+        <div class="comparison-view slide-in">
+            <div class="media-section">
+                <h3><i class="fas fa-video" style="margin-right: 8px;"></i>Original Video</h3>
+                <video controls class="media-preview">
+                    <source src="{{ result.file_path }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div class="media-section">
+                <h3><i class="fas fa-play" style="margin-right: 8px;"></i>Processed Video</h3>
+                <video controls class="media-preview">
+                    <source src="{{ result.processed_video }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Detection Summary -->
+        <div class="detection-summary slide-in">
+            <h2 class="title-md text-gradient mb-6">
+                <i class="fas fa-chart-bar" style="margin-right: 8px;"></i>Detection Summary
+            </h2>
+            
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <div class="stat-number text-success">{{ result.detections|length }}</div>
+                    <div class="stat-label">Total Persons Detected</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number text-info">
+                        {{ result.detections|selectattr("status", "equalto", "FOCUSED")|list|length }}
+                    </div>
+                    <div class="stat-label">Focused Persons</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number text-warning">
+                        {{ result.detections|selectattr("status", "equalto", "NOT FOCUSED")|list|length }}
+                    </div>
+                    <div class="stat-label">Unfocused Persons</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number text-danger">
+                        {{ (result.detections|selectattr("status", "equalto", "YAWNING")|list|length) + 
+                           (result.detections|selectattr("status", "equalto", "SLEEPING")|list|length) }}
+                    </div>
+                    <div class="stat-label">Attention Issues</div>
+                </div>
+            </div>
+
+            <!-- Overall Status -->
+            {% set focused_count = result.detections|selectattr("status", "equalto", "FOCUSED")|list|length %}
+            {% set total_count = result.detections|length %}
+            {% if total_count > 0 %}
+                {% set focus_percentage = (focused_count / total_count * 100)|round %}
+                <div class="text-center">
+                    <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 8px;">
+                        Overall Focus Score: 
+                        <span class="{% if focus_percentage >= 80 %}text-success{% elif focus_percentage >= 60 %}text-warning{% else %}text-danger{% endif %}">
+                            {{ focus_percentage }}%
+                        </span>
+                    </div>
+                    <p style="color: var(--text-secondary);">
+                        {% if focus_percentage >= 80 %}
+                            Excellent focus levels detected
+                        {% elif focus_percentage >= 60 %}
+                            Moderate focus levels - some attention needed
+                        {% else %}
+                            Low focus levels - immediate attention recommended
+                        {% endif %}
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Individual Detection Results -->
+        {% if result.detections %}
+        <div class="slide-in">
+            <h2 class="title-md text-gradient mb-6">
+                <i class="fas fa-users" style="margin-right: 8px;"></i>Individual Analysis
+            </h2>
+            
+            <div class="detection-grid">
+                {% for detection in result.detections %}
+                <div class="person-card">
+                    <!-- Person Image -->
+                    <img src="{{ detection.image_path }}" alt="Person {{ detection.id }}" class="person-image">
+                    
+                    <!-- Status Badge -->
+                    <div class="status-badge 
+                        {% if detection.status == 'FOCUSED' %}focused
+                        {% elif detection.status == 'NOT FOCUSED' %}unfocused
+                        {% elif detection.status == 'YAWNING' %}yawning
+                        {% elif detection.status == 'SLEEPING' %}sleeping
+                        {% endif %}">
+                        <span class="status-indicator 
+                            {% if detection.status == 'FOCUSED' %}status-focused
+                            {% elif detection.status == 'NOT FOCUSED' %}status-unfocused
+                            {% elif detection.status == 'YAWNING' %}status-yawning
+                            {% elif detection.status == 'SLEEPING' %}status-sleeping
+                            {% endif %}"></span>
+                        {{ detection.status }}
+                    </div>
+                    
+                    <!-- Person Details -->
+                    <div class="person-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Person ID:</span>
+                            <span class="detail-value">#{{ detection.id }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Confidence:</span>
+                            <span class="detail-value">{{ (detection.confidence * 100)|round(1) }}%</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Position:</span>
+                            <span class="detail-value">
+                                X: {{ detection.bbox[0] }}, Y: {{ detection.bbox[1] }}
+                            </span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Size:</span>
+                            <span class="detail-value">
+                                {{ detection.bbox[2] }} × {{ detection.bbox[3] }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Download Section -->
+        <div class="download-section slide-in">
+            <h2 class="title-md text-gradient mb-4">
+                <i class="fas fa-download" style="margin-right: 8px;"></i>Download Results
+            </h2>
+            <p style="color: var(--text-secondary); margin-bottom: 24px;">Download processed files and analysis reports</p>
+            
+            <div class="download-grid">
+                {% if result.type == 'image' %}
+                <div class="download-item">
+                    <div class="download-info">
+                        <div class="file-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600;">Processed Image</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">With detection overlay</div>
+                        </div>
+                    </div>
+                    <a href="{{ result.processed_image }}" download class="btn btn-primary">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </div>
+                {% elif result.type == 'video' %}
+                <div class="download-item">
+                    <div class="download-info">
+                        <div class="file-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600;">Processed Video</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">With detection overlay</div>
+                        </div>
+                    </div>
+                    <a href="{{ result.processed_video }}" download class="btn btn-primary">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if result.pdf_report %}
+                <div class="download-item">
+                    <div class="download-info">
+                        <div class="file-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600;">Analysis Report</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">Detailed PDF report</div>
+                        </div>
+                    </div>
+                    <a href="{{ result.pdf_report }}" download class="btn btn-secondary">
+                        <i class="fas fa-download"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons slide-in">
+            <a href="/upload" class="btn btn-primary">
+                <i class="fas fa-upload" style="margin-right: 8px;"></i>
+                Analyze Another File
+            </a>
+            <a href="/live" class="btn btn-secondary">
+                <i class="fas fa-video" style="margin-right: 8px;"></i>
+                Start Live Monitoring
+            </a>
+            <a href="/" class="btn btn-secondary">
+                <i class="fas fa-home" style="margin-right: 8px;"></i>
+                Back to Home
+            </a>
+        </div>
+        
+        {% else %}
+        <!-- No Results -->
+        <div class="text-center slide-in">
+            <div class="glass-card p-8">
+                <i class="fas fa-exclamation-triangle" style="font-size: 4rem; color: var(--warning); margin-bottom: 16px;"></i>
+                <h2 class="title-md text-gradient mb-4">No Results Found</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 24px;">
+                    There was an issue processing your file or no faces were detected.
+                </p>
+                <a href="/upload" class="btn btn-primary">
+                    <i class="fas fa-redo" style="margin-right: 8px;"></i>
+                    Try Again
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="../static/js/result.js"></script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload & Analyze - Smart Focus Alert</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/upload.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="flex justify-between items-center">
+                <a href="/" class="nav-brand text-gradient">
+                    <i class="fas fa-eye" style="margin-right: 8px;"></i>
+                    Smart Focus Alert
+                </a>
+                <div class="nav-links">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/live" class="nav-link">Live Monitoring</a>
+                    <a href="/upload" class="nav-link active">Upload</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="upload-container">
+        <!-- Header -->
+        <div class="text-center fade-in">
+            <h1 class="title-lg text-gradient">Upload & Analyze</h1>
+            <p style="color: var(--text-secondary);">Upload images or videos to analyze focus patterns with AI-powered detection.</p>
+        </div>
+
+        <!-- Main Layout - Fixed 50/50 Split -->
+        <div class="main-layout">
+            <!-- Left Column - Upload Section -->
+            <div class="left-column">
+                <!-- Upload Form -->
+                <form id="uploadForm" method="POST" enctype="multipart/form-data" class="slide-in">
+                    <!-- File Drop Zone -->
+                    <div class="file-drop-zone" id="dropZone">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px;" class="text-gradient">Drop your files here or click to browse</h3>
+                        <input type="file" id="fileInput" name="file" accept="image/*,video/*" style="display: none;">
+                        <button type="button" class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-folder-open" style="margin-right: 8px;"></i>
+                            Browse file
+                        </button>
+                        
+                        <div class="supported-formats">
+                            <span class="format-badge">JPG</span>
+                            <span class="format-badge">PNG</span>
+                            <span class="format-badge">MP4</span>
+                            <span class="format-badge">AVI</span>
+                            <span class="format-badge">MOV</span>
+                            <span class="format-badge">MKV</span>
+                        </div>
+                    </div>
+
+                    <!-- Upload Progress -->
+                    <div class="upload-progress" id="uploadProgress">
+                        <div class="flex justify-between items-center" style="margin-bottom: 8px;">
+                            <span style="color: var(--text-secondary);">Processing & Analyzing...</span>
+                            <span style="color: var(--text-secondary);" id="progressPercent">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+
+                    <!-- File Info -->
+                    <div class="file-info" id="fileInfo">
+                        <h4 style="font-weight: 600; margin-bottom: 16px; color: var(--primary-blue);">Selected File</h4>
+                        <div class="file-preview-container">
+                            <div class="file-preview" id="filePreviewContainer">
+                                <img id="filePreview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px; display: none;" alt="File preview">
+                                <div id="videoPreview" style="display: none;">
+                                    <i class="fas fa-video" style="font-size: 2.5rem; color: var(--info);"></i>
+                                </div>
+                            </div>
+                            <div class="file-details">
+                                <p><strong>Name:</strong> <span id="fileName"></span></p>
+                                <p><strong>Size:</strong> <span id="fileSize"></span></p>
+                                <p><strong>Type:</strong> <span id="fileType"></span></p>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" id="analyzeBtn" disabled style="width: 100%; margin-top: 16px;">
+                            <i class="fas fa-search" style="margin-right: 8px;"></i>
+                            Analyze & Generate Report
+                        </button>
+                    </div>
+
+                    <!-- Messages -->
+                    <div class="message message-error" id="errorMessage">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="errorText"></span>
+                    </div>
+
+                    <div class="message message-success" id="successMessage">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="successText"></span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Column - Quick Tips -->
+            <div class="right-column">
+                <!-- Quick Tips -->
+                <div class="quick-tips slide-in">
+                    <h3 style="color: var(--warning); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">
+                        <i class="fas fa-lightbulb"></i>
+                        Quick Tips
+                    </h3>
+                    
+                    <div class="tip-item">
+                        <i class="fas fa-check tip-icon"></i>
+                        <div class="tip-content">
+                            <h4>Good Lighting</h4>
+                            <p>Ensure faces are well-lit and clearly visible for accurate landmark detection</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tip-item">
+                        <i class="fas fa-check tip-icon"></i>
+                        <div class="tip-content">
+                            <h4>Front-facing</h4>
+                            <p>Faces should be facing the camera directly for optimal iris tracking</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tip-item">
+                        <i class="fas fa-check tip-icon"></i>
+                        <div class="tip-content">
+                            <h4>Clear Images</h4>
+                            <p>Use high-resolution images for better facial landmark precision</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tip-item">
+                        <i class="fas fa-check tip-icon"></i>
+                        <div class="tip-content">
+                            <h4>File Size</h4>
+                            <p>Keep files under 100MB for faster processing and report generation</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- What You'll Get - Full Width Below -->
+        <div class="what-you-get slide-in">
+            <h3>
+                <i class="fas fa-bookmark"></i>
+                What You'll Get?
+            </h3>
+            
+            <div class="output-sections">
+                <div class="output-section">
+                    <h4>Processed Media</h4>
+                    <ul class="output-list">
+                        <li><i class="fas fa-check"></i> Facial landmark overlays</li>
+                        <li><i class="fas fa-check"></i> Detection state indicators</li>
+                        <li><i class="fas fa-check"></i> Bounding box annotations</li>
+                        <li><i class="fas fa-check"></i> Individual face crops</li>
+                    </ul>
+                </div>
+                
+                <div class="output-section">
+                    <h4>PDF Report</h4>
+                    <ul class="output-list">
+                        <li><i class="fas fa-check"></i> File information & metadata</li>
+                        <li><i class="fas fa-check"></i> Focus accuracy statistics</li>
+                        <li><i class="fas fa-check"></i> Individual detection results</li>
+                        <li><i class="fas fa-check"></i> Structural formatting</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../static/js/upload.js"></script>
+</body>
+</html>

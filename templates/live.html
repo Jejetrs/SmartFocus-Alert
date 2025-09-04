@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Focus Monitoring - Smart Focus Alert</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/live.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="flex justify-between items-center">
+                <a href="/" class="nav-brand text-gradient">
+                    <i class="fas fa-eye"></i>
+                    Smart Focus Alert
+                </a>
+                <div class="nav-links">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/live" class="nav-link active">Live Monitoring</a>
+                    <a href="/upload" class="nav-link">Upload</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="page-header">
+            <h1 class="page-title text-gradient">Live Focus Monitoring</h1>
+            <p class="page-subtitle">Real-time focus detection with facial landmarks, automatic recording, and comprehensive reporting</p>
+            
+            <!-- Study Position Guide -->
+            <div class="study-position-guide">
+                <div class="guide-header">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>Study Position Guide</span>
+                </div>
+                
+                <div class="position-cards">
+                    <div class="position-card">
+                        <div class="card-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-text">Position yourself centrally in camera view</span>
+                        </div>
+                    </div>
+                    
+                    <div class="position-card">
+                        <div class="card-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-text">Camera at eye level, 60-90cm distance</span>
+                        </div>
+                    </div>
+                    
+                    <div class="position-card">
+                        <div class="card-icon">
+                            <i class="fas fa-chair"></i>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-text">Sit upright, maintain steady position</span>
+                        </div>
+                    </div>
+                    
+                    <div class="position-card">
+                        <div class="card-icon">
+                            <i class="fas fa-hand-paper"></i>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-text">Avoid covering face or moving frequently</span>
+                        </div>
+                    </div>
+                    
+                    <div class="position-card">
+                        <div class="card-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-text">Ensure good lighting on your face</span>
+                        </div>
+                    </div>
+                    
+                    <div class="position-card">
+                        <div class="card-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-text">Stay as the only person in camera frame</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="monitoring-status-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-chart-line"></i>
+                    Monitoring Status
+                </h2>
+                <div class="live-indicator" id="liveIndicator">
+                    <div class="live-dot" id="liveDot"></div>
+                    <span id="liveText">READY</span>
+                </div>
+            </div>
+            
+            <div class="status-display" id="currentStatus">
+                <span class="status-indicator"></span>
+                System ready - Click Start to begin monitoring
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" style="color: var(--success);" id="personDetected">0</div>
+                    <div class="stat-label">Person Detected</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: var(--info);" id="focusedState">0</div>
+                    <div class="stat-label">Currently Focused</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" style="color: var(--warning);" id="alertCount">0</div>
+                    <div class="stat-label">Total Alerts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value text-gradient" id="sessionTime">00:00:00</div>
+                    <div class="stat-label">Session Time</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="left-column">
+                <div class="video-container">
+                    <img src="" class="video-stream" id="videoStream" alt="Live Video Feed" style="display: none;">
+                    
+                    <video id="clientVideo" class="client-video" autoplay></video>
+                    <canvas id="clientCanvas" class="client-canvas" width="640" height="480"></canvas>
+                    
+                    <div class="video-placeholder" id="videoPlaceholder">
+                        <i class="fas fa-video"></i>
+                        <h3 style="margin-bottom: 12px;">Detection System</h3>
+                        <p style="margin-bottom: 20px;">Click "Start Monitoring" to begin focus detection</p>
+                        <div style="text-align: left; max-width: 500px; line-height: 1.6;">
+                            <div style="margin-bottom: 8px;">• <strong>Sleep Detection:</strong> Alert after 8 seconds</div>
+                            <div style="margin-bottom: 8px;">• <strong>Yawning Detection:</strong> Alert after 3.5 seconds</div>
+                            <div style="margin-bottom: 8px;">• <strong>Unfocus Detection:</strong> Alert after 8 seconds</div>
+                            <div style="margin-bottom: 8px;">• <strong>No Person Detection:</strong> Alert after 10 seconds</div>
+                            <div>• <strong>Audio Alerts:</strong> Speech and beep notifications</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="controls-panel">
+                    <button class="btn btn-primary" id="startBtn" onclick="startMonitoring()">
+                        <i class="fas fa-play"></i>
+                        Start Monitoring
+                    </button>
+                    <button class="btn btn-danger" id="stopBtn" onclick="stopMonitoring()" disabled>
+                        <i class="fas fa-stop"></i>
+                        Stop & Generate Reports
+                    </button>
+                </div>
+
+                <!-- System Health and Detection Thresholds Row -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                    <div class="left-card">
+                        <div class="sidebar-header">
+                            <i class="fas fa-heartbeat"></i>
+                            System Health
+                        </div>
+                        
+                        <div class="status-health" id="systemHealth">
+                            <div class="health-item">
+                                <span>Audio System:</span>
+                                <span class="health-status ok" id="audioHealth">Ready</span>
+                            </div>
+                            <div class="health-item">
+                                <span>Speech Alerts:</span>
+                                <span class="health-status ok" id="speechHealth">Ready</span>
+                            </div>
+                            <div class="health-item">
+                                <span>Beep Alerts:</span>
+                                <span class="health-status ok" id="beepHealth">Ready</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="left-card">
+                        <div class="sidebar-header">
+                            <i class="fas fa-list"></i>
+                            Detection Thresholds
+                        </div>
+                        
+                        <div class="thresholds-grid">
+                            <div class="threshold-item threshold-sleep">
+                                <div class="threshold-label">Sleep</div>
+                                <div class="threshold-time">8<br>seconds</div>
+                            </div>
+                            <div class="threshold-item threshold-yawning">
+                                <div class="threshold-label">Yawning</div>
+                                <div class="threshold-time">3.5<br>seconds</div>
+                            </div>
+                            <div class="threshold-item threshold-focus">
+                                <div class="threshold-label">No<br>Focus</div>
+                                <div class="threshold-time">8<br>seconds</div>
+                            </div>
+                            <div class="threshold-item threshold-no-person">
+                                <div class="threshold-label">No<br>Person</div>
+                                <div class="threshold-time">10<br>seconds</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="left-card" style="display: none;" id="downloadsSection">
+                    <div class="sidebar-header">
+                        <i class="fas fa-download"></i>
+                        Session Downloads
+                    </div>
+                    
+                    <!-- Warning Notice -->
+                    <div class="warning-notice">
+                        <div class="warning-notice-header">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 0.9rem;"></i>
+                            <span class="warning-notice-title">Important Notice</span>
+                        </div>
+                        <div class="warning-notice-text">
+                            Please do not leave this live session or switch pages until all documents are successfully downloaded to your device.
+                        </div>
+                    </div>
+                    
+                    <div id="downloadItems">
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="sidebar-card">
+                    <div class="connection-status">
+                        <div class="connection-icon" id="connectionIcon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="connection-text">
+                            <div class="connection-title">Audio Alert System</div>
+                            <div class="connection-subtitle" id="connectionSubtitle">Speech and beep alerts ready</div>
+                        </div>
+                    </div>
+
+                    <div class="audio-alert">
+                        <i class="fas fa-volume-up" style="color: var(--text-secondary);"></i>
+                        <span style="flex: 1; font-weight: 500;">Audio Alerts</span>
+                        <div class="toggle-switch" onclick="toggleAudioAlert()"></div>
+                    </div>
+
+                    <div class="audio-alert" style="margin-bottom: 0;">
+                        <span style="color: var(--text-secondary); font-size: 0.9rem;" id="audioStatus">Audio alerts enabled</span>
+                    </div>
+                    
+                    <div style="margin-top: 16px;">
+                        <label class="volume-label">Audio alert volume:</label>
+                        <select class="volume-select" id="alertVolume">
+                            <option value="0.3">Low</option>
+                            <option value="0.6" selected>Medium</option>
+                            <option value="1.0">High</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <div class="sidebar-header">
+                        <i class="fas fa-user"></i>
+                        Live Detection Details
+                        <div class="alert-badge" id="detectionBadge" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            ALERT
+                        </div>
+                    </div>
+                    
+                    <div class="detection-info" id="detectionInfo">
+                        <div class="text-center" style="color: var(--text-secondary); padding: 20px;">
+                            <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 12px; display: block;"></i>
+                            <p>Detection system ready</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <div class="sidebar-header">
+                        <i class="fas fa-list"></i>
+                        Alert History
+                    </div>
+                    
+                    <div class="alert-history" id="alertHistory">
+                        <div class="text-center" style="color: var(--text-secondary); padding: 20px;">
+                            <i class="fas fa-clock" style="font-size: 2rem; margin-bottom: 12px; display: block;"></i>
+                            <p>No alerts yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../static/js/live.js"></script>
+</body>
+</html>
