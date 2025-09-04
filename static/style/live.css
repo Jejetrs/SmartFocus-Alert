@@ -671,8 +671,7 @@
       border: 1px solid var(--glass-border);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
+      justify-content: bottom;
       min-height: 80px;
   }
 
