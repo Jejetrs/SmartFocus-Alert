@@ -59,6 +59,7 @@ Smart Focus Alert is a web application that uses Computer Vision and MediaPipe t
 - **Lighting**: Adequate lighting for optimal face detection
 
 ## 🚀 Demo & Deployment
+<img width="1895" height="824" alt="AppPreview" src="https://github.com/user-attachments/assets/9cb1df8d-4fdc-4730-9ea1-7707266ceb84" />
 
 **Live Application**: [https://smartfocus.up.railway.app](https://smartfocus.up.railway.app)
 
@@ -119,30 +120,30 @@ Application will run at `http://localhost:5000`
 
 ```
 SmartFocus-Alert/
-├── app.py                 # Main backend (Flask)
-├── static/
+├── app.py                 # Main backend using Flask, handles routing and server logic
+├── static/                # Folder for static assets like JS, CSS, images
 │   ├── js/
-│   │   ├── index.js       # Homepage logic
-│   │   ├── live.js        # Live monitoring
-│   │   ├── upload.js      # File upload
-│   │   └── result.js      # Results display
+│   │   ├── index.js       # Homepage interactivity scripts
+│   │   ├── live.js        # Live focus monitoring scripts
+│   │   ├── upload.js      # File upload feature scripts
+│   │   └── result.js      # Scripts to display detection/focus results
 │   └── style/
-│       ├── index.css      # Homepage styling
-│       ├── live.css       # Live monitoring UI
-│       ├── upload.css     # Upload interface
-│       └── result.css     # Results styling
-├── templates/
-│   ├── index.html         # Homepage
-│   ├── live.html          # Live monitoring
-│   ├── upload.html        # File upload
-│   └── result.html        # Results page
-├── requirements.txt       # Python dependencies
-├── Dockerfile            # Docker configuration
-├── nixpacks.toml 
-├── Procfile             # Railway deployment
-├── railway.json 
-├── railway.toml         # Railway config
-└── README.md           # Documentation
+│       ├── index.css      # Styling for homepage
+│       ├── live.css       # Styling for live monitoring page
+│       ├── upload.css     # Styling for file upload page
+│       └── result.css     # Styling for results page
+├── templates/             # HTML templates used by Flask
+│   ├── index.html         # Homepage template
+│   ├── live.html          # Live monitoring page template
+│   ├── upload.html        # File upload page template
+│   └── result.html        # Results page template
+├── requirements.txt       # Python dependencies (Flask, OpenCV, etc.)
+├── Dockerfile             # Docker configuration for containerizing the app
+├── nixpacks.toml          # Deployment metadata & service configuration for Railway
+├── Procfile               # Start command for Railway/Heroku deployment
+├── railway.json           # Railway project configuration (project metadata)
+├── railway.toml           # Railway config for environment, services, and build
+└── README.md              # Project documentation (setup, usage, etc.)
 ```
 
 ## 🔧 API Endpoints
