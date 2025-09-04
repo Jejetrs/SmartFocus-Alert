@@ -252,28 +252,6 @@ Solutions:
 5. Test with headphones if using external speakers
 ```
 
-### Performance Issues
-
-**Application slow / lagging during detection**
-```
-Solutions:
-1. Close unnecessary browser tabs
-2. Ensure minimum 4GB RAM available
-3. Use Chrome browser for optimal performance
-4. Restart browser if memory usage is high
-5. Reduce camera resolution if possible
-```
-
-**Low frame rate**
-```
-Solutions:
-1. Check internet connection (for online application)
-2. Close other heavy applications
-3. Use stable lighting
-4. Avoid excessive movement during detection
-5. Restart system if necessary
-```
-
 ### File Upload Issues
 
 **File cannot be uploaded**
@@ -295,7 +273,6 @@ Solutions:
 2. Try file with lower resolution
 3. Check if file contains clear faces
 4. Use more common file formats (MP4 for video, JPG for images)
-5. Contact support if error continues
 ```
 
 ### Browser Issues
@@ -313,7 +290,7 @@ Solutions:
 **Layout displays incorrectly**
 ```
 Solutions:
-1. Refresh page with Ctrl+F5 (Windows) or Cmd+Shift+R (Mac)
+1. Refresh page
 2. Check browser zoom level (100% recommended)
 3. Disable dark mode extensions
 4. Clear CSS cache
@@ -329,7 +306,6 @@ Solutions:
 2. Check browser download settings
 3. Ensure sufficient storage space
 4. Wait until file generation process completes
-5. Try right-click > Save As if direct download fails
 ```
 
 **File corrupted/cannot open**
@@ -339,7 +315,6 @@ Solutions:
 2. Ensure download completed 100%
 3. Try different PDF reader/video player
 4. Check antivirus that might be blocking
-5. Contact support to regenerate file
 ```
 
 ### Error Messages
@@ -350,8 +325,9 @@ Solutions:
 1. Refresh application page
 2. Clear browser cache
 3. Ensure stable internet connection
-4. Try different browser
-5. Restart device if necessary
+4. Check browser version, then upgrade browser version if necessary
+5. Try different browser
+6. Restart device if necessary
 ```
 
 **"Session timeout"**
