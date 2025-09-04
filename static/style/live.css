@@ -671,13 +671,14 @@
       border: 1px solid var(--glass-border);
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
+      align-items: center;
       min-height: 80px;
   }
 
   .threshold-label {
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: auto;
       font-size: 0.85rem;
       line-height: 1.2;
   }
